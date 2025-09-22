@@ -7,7 +7,7 @@ Ders ve teneffüs vakitlerinden kalan sürenin ayarlanabilir bir uygulama aracı
 ## Özellikleri
 - Ders ve teneffüslerin ayar panelinden ayarlanabilmesi
 - Ekrandaki logonun, arkaplan renginin, sayaç renginin ayar panelinden değiştirilebilmesi
-- Alıntılar moduyla sayacın altında tarihteki önemli alıntıların gösterilebilmesi ve bu sözlerin ve değişim sıklığının ayar panelinedn ayarlanabilmesi
+- Alıntılar moduyla sayacın altında tarihteki önemli alıntıların gösterilebilmesi ve bu sözlerin ve değişim sıklığının ayar panelinden ayarlanabilmesi
 - Çoklu ders/teneffüs ekleme modu
 ## Gereksinimler
 ### Donanım Gereksinimleri
