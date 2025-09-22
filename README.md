@@ -1,1 +1,0 @@
-# okul_sayac
