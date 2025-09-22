@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8"/>
+  <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Poppins:wght@400;600;700&family=Fredoka+One&display=swap" 
+        onload="this.rel='stylesheet'" rel="stylesheet"/>
+  <title>Study Break Timer</title>
+  <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+  <style type="text/tailwindcss">
+    :root {
+      --primary-color: #4A90E2;
+      --secondary-color: #F5A623;
+      --background-color: #F0F4F8;
+    }
+    .font-display { font-family: 'Poppins', cursive; }
+    .font-body { font-family: 'Poppins', sans-serif; }
+  </style>
+</head>
+<body class="bg-[var(--background-color)] font-body">
+  <div class="relative flex min-h-screen flex-col items-center justify-center text-gray-800 p-8 overflow-hidden bg-cover bg-center" 
+       style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCL3Jj5n7_yXjK6k3cT1_f3M2xO4b2g3S4T1S7g2Z1F1J0H9e7K8R7f3P9o1X7w2V1f0H8c7a6X5z4N3p2O1q0c9b8r7S6t5E4D3c2B1a');">
+    <div class="absolute inset-0 bg-black/40"></div>
+    <main class="text-center z-10">
+      <div class="mb-12">
+        <h1 class="font-display text-6xl font-bold text-white drop-shadow-lg">
+          <span id="decider">Dersin</span> Başlamasına Kalan Süre
+        </h1>
+      </div>
+      <div class="flex items-center justify-center space-x-4 md:space-x-6 mb-16">
+        <div class="flex flex-col items-center">
+          <div id="hours" class="font-display text-8xl md:text-9xl font-bold tracking-tighter w-40 h-40 
+               md:w-48 md:h-48 flex items-center justify-center bg-white/90 rounded-2xl shadow-xl 
+               backdrop-blur-sm text-[var(--primary-color)]">00</div>
+          <p class="mt-5 text-2xl md:text-3xl font-semibold text-white">Saat</p>
+        </div>
+        <div class="font-display text-8xl md:text-9xl font-bold text-white">:</div>
+        <div class="flex flex-col items-center">
+          <div id="minutes" class="font-display text-8xl md:text-9xl font-bold tracking-tighter w-40 h-40 
+               md:w-48 md:h-48 flex items-center justify-center bg-white/90 rounded-2xl shadow-xl 
+               backdrop-blur-sm text-[var(--primary-color)]">00</div>
+          <p class="mt-5 text-2xl md:text-3xl font-semibold text-white">Dakika</p>
+        </div>
+        <div class="font-display text-8xl md:text-9xl font-bold text-white">:</div>
+        <div class="flex flex-col items-center">
+          <div id="seconds" class="font-display text-8xl md:text-9xl font-bold tracking-tighter w-40 h-40 
+               md:w-48 md:h-48 flex items-center justify-center bg-white/90 rounded-2xl shadow-xl 
+               backdrop-blur-sm text-[var(--primary-color)]">00</div>
+          <p class="mt-5 text-2xl md:text-3xl font-semibold text-white">Saniye</p>
+        </div>
+      </div>
+      <div class="mt-16 bg-white/80 p-10 rounded-lg shadow-lg max-w-3xl mx-auto backdrop-blur-md">
+        <p id="mentions" class="text-3xl text-gray-800 italic leading-relaxed">
+          "The expert in anything was once a beginner."
+        </p>
+      </div>
+    </main>
+  </div>
+
+<script>
+// --- Verileri localStorage'dan yükle ---
+let schedule = JSON.parse(localStorage.getItem("schedule")) || {};
+let quotes = JSON.parse(localStorage.getItem("quotes")) || [];
+
+// 1 = her ders, 2 = her gün (hafta içi)
+let frequency = parseInt(localStorage.getItem("frequency")) || 1;
+
+// Eğer eski formatta sadece string varsa, objeye çevir
+quotes = quotes.map(q => typeof q === "string" ? { text: q, current: false } : q);
+
+// --- Söz gösterme ---
+function showQuote() {
+  const current = quotes.find(q => q.current);
+  if (current) {
+    document.getElementById("mentions").textContent = current.text;
+  } else if (quotes.length > 0) {
+    quotes[0].current = true;
+    localStorage.setItem("quotes", JSON.stringify(quotes));
+    document.getElementById("mentions").textContent = quotes[0].text;
+  }
+}
+
+// --- Yeni söze geçiş ---
+function showNewQuote() {
+  if (quotes.length === 0) return;
+
+  let currentIndex = quotes.findIndex(q => q.current);
+  if (currentIndex === -1) currentIndex = 0;
+
+  quotes[currentIndex].current = false;
+
+  const newIndex = (currentIndex + 1) % quotes.length;
+  quotes[newIndex].current = true;
+
+  localStorage.setItem("quotes", JSON.stringify(quotes));
+  document.getElementById("mentions").textContent = quotes[newIndex].text;
+}
+
+// --- Ders/gün değişiminde quote değiştirme ---
+function handleQuoteChange(type) {
+  const now = new Date();
+
+  if (frequency === 1 && type === "ders") {
+    // Her ders başında
+    showNewQuote();
+  } else if (frequency === 2) {
+    // Her gün (sadece hafta içi)
+    const dayOfWeek = now.getDay(); // 0= Pazar, 6= Cumartesi
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      const today = now.toDateString();
+      const lastDate = localStorage.getItem("lastQuoteDate");
+
+      if (lastDate !== today) {
+        showNewQuote();
+        localStorage.setItem("lastQuoteDate", today);
+      }
+    }
+  }
+}
+
+// --- Sonraki ders/teneffüs zamanı bulma (örnek şablon) ---
+// --- Sonraki ders/teneffüs zamanı bulma ---
+function getNextLessonTime() {
+  const schedule = JSON.parse(localStorage.getItem("schedule")) || {};
+  const now = new Date();
+  const day = now.getDay(); // 0 = Pazar, 1 = Pazartesi ...
+
+  const lessons = schedule[day] || [];
+  for (let i = 0; i < lessons.length; i++) {
+    const item = lessons[i];
+    const [sh, sm] = item.start.split(":").map(Number);
+    const lessonTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), sh, sm);
+
+    if (lessonTime > now) {
+      return { day, time: lessonTime, type: item.type };
+    }
+  }
+
+  // Bugün ders kalmadıysa → sonraki günün ilk dersi
+  let nextDay = (day + 1) % 7;
+  let offset = 1;
+  while (!(schedule[nextDay] && schedule[nextDay].length)) {
+    nextDay = (nextDay + 1) % 7;
+    offset++;
+    if (offset > 7) return null; // hiç ders yok
+  }
+
+  const firstItem = schedule[nextDay][0];
+  const [sh, sm] = firstItem.start.split(":").map(Number);
+
+  const target = new Date(now);
+  target.setDate(now.getDate() + offset);
+  target.setHours(sh, sm, 0, 0);
+
+  return { day: nextDay, time: target, type: firstItem.type };
+}
+
+// --- Sayaç güncelleme ---
+function updateCountdown() {
+  const nextItem = getNextLessonTime();
+  const hourEl = document.querySelector("#hours");
+  const minEl = document.querySelector("#minutes");
+  const secEl = document.querySelector("#seconds");
+  const deciderEl = document.querySelector("#decider");
+
+  if (!nextItem) {
+    hourEl.textContent = "00";
+    minEl.textContent = "00";
+    secEl.textContent = "00";
+    deciderEl.textContent = "Günün";
+    return;
+  }
+
+  const now = new Date();
+  let diff = Math.floor((nextItem.time - now) / 1000);
+  if (diff < 0) diff = 0;
+
+  const hours = String(Math.floor(diff / 3600)).padStart(2, "0");
+  const minutes = String(Math.floor((diff % 3600) / 60)).padStart(2, "0");
+  const seconds = String(diff % 60).padStart(2, "0");
+
+  hourEl.textContent = hours;
+  minEl.textContent = minutes;
+  secEl.textContent = seconds;
+
+  deciderEl.textContent = (nextItem.type === "ders") ? "Dersin" : "Teneffüsün";
+
+  // Söz değiştirme tetikleme (sadece bir kez)
+  if (diff === 0 && !updateCountdown.triggered) {
+    handleQuoteChange(nextItem.type);
+    updateCountdown.triggered = true;
+    setTimeout(() => { updateCountdown.triggered = false; }, 2000); // 2 sn sonra reset
+  }
+}
+
+// --- İlk sözü göster ---
+showQuote();
+
+// Sayaç başlat
+setInterval(updateCountdown, 1000);
+</script>
+
+
+
+</body>
+</html>
