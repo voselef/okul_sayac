@@ -1,6 +1,6 @@
 # Okul Sayaç Uygulaması
 ## Amacı:
-Ders ve teneffüs vakitlerinden kalan sürenin ayarlananbilir bir uygulama aracılığı ile öğrenciye zilsiz bir şekilde gösterilerek öğrencinin öz denetimini geliştirmek
+Ders ve teneffüs vakitlerinden kalan sürenin ayarlanabilir bir uygulama aracılığı ile öğrenciye zilsiz bir şekilde gösterilerek öğrencinin öz denetimini geliştirmek
 ## Uygulanışı
 1. Ders ve teneffüs süreleri daha önceden ayar panelinden ayarlanır.
 2. Bilgisayar görev günü açıldığında otomatik olarak uygulamayı kiosk modunda başlatır ve sayaç devreye girer.
