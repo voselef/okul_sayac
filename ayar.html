@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Ders Programı Ayarları</title>
+  <link rel="stylesheet" href="bootstrap.css">
+  <style>
+    #daySelect {
+      display: inline;
+      width: auto;
+    }
+
+    body {
+      padding-left: 10px;
+    }
+
+    .w-a {
+      width: auto;
+    }
+
+    li {
+      list-style: none;
+    }
+
+    input[type=radio] {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <br>
+  <a href="index.html" class="btn btn-primary">Sayaca Geri Gel</a>
+  <br>
+
+  <h1>Ders Programı Ayarları</h1>
+
+  <!-- Gün seçimi -->
+  <label>Gün Seç:
+    <select class="form-select" id="daySelect" onchange="renderSchedule()">
+      <option value="1">Pazartesi</option>
+      <option value="2">Salı</option>
+      <option value="3">Çarşamba</option>
+      <option value="4">Perşembe</option>
+      <option value="5">Cuma</option>
+      <option value="6">Cumartesi</option>
+      <option value="0">Pazar</option>
+    </select>
+  </label>
+  <br><br>
+  <label>Çoklu Gün Seç:
+    <select class="form-select" id="multiDaySelect" multiple size="5">
+      <option value="1">Pazartesi</option>
+      <option value="2">Salı</option>
+      <option value="3">Çarşamba</option>
+      <option value="4">Perşembe</option>
+      <option value="5">Cuma</option>
+      <option value="6">Cumartesi</option>
+      <option value="0">Pazar</option>
+    </select>
+  </label>
+  <br>
+  <span class="form-text">Çoklu seçimle düzenleme yapılamaz. Tekli düzenlemeye geçmeden önce sayfayı yenileyerek seçimi temizleyin.</span>
+  <h2>Seçili Günün Programı</h2>
+  <div>
+    <select class="form-select d-inline w-a" id="typeSelect">
+      <option value="ders">Ders</option>
+      <option value="teneffus">Teneffüs</option>
+    </select>
+    <input class="form-control d-inline w-a" type="time" id="startTime">
+    <input class="form-control d-inline w-a" type="time" id="endTime">
+    <button class="btn btn-primary d-inline w-a" onclick="addItem()">Ekle</button>
+  </div>
+  <ul id="scheduleList"></ul>
+
+  <br>
+
+  <!-- Renk Ayarları -->
+  <h2>Renk Ayarları</h2>
+  <div>
+    <label> Sayaç Rengi: <br><br>
+      <input class="form-control" type="color" id="timerColorInput" onchange="saveTimerColor(this.value)">
+      <br><button class="btn btn-primary"
+        onclick="this.parentNode.querySelector('input').value = '#4A90E2';saveTimerColor(this.value)">Sıfırla</button>
+    </label>
+    <br><br>
+    <label> Arka Plan Rengi: <br><br>
+      <input class="form-control" type="color" id="bgColorInput" onchange="saveBgColor(this.value)">
+      <br><button class="btn btn-primary"
+        onclick="this.parentNode.querySelector('input').setAttribute('type', 'text');this.parentNode.querySelector('input').value = '#00000066';saveBgColor(this.value)">Sıfırla</button>
+
+    </label>
+  </div>
+
+  <br><br>
+
+  <h2>Sözler (Quotes)</h2>
+  <div>
+    <textarea class="form-control d-inline w-a" id="quoteInput" placeholder="Her satıra bir söz yaz" rows="4"
+      cols="50"></textarea>
+    <br>
+    <button class="btn btn-primary d-inline w-a" onclick="addQuote()">Ekle</button>
+  </div>
+  <ul id="quoteList"></ul>
+
+  <!-- Quote değiştirme ayarı -->
+  <h3>Söz Değişim Sıklığı</h3>
+  <label>
+    <input type="radio" name="frequency" value="1" onchange="saveFrequency(this.value)">
+    <span class="btn btn-primary p-1">Her ders başında değişsin</span>
+  </label><br>
+  <label style="margin-top:10px">
+    <input type="radio" name="frequency" value="2" onchange="saveFrequency(this.value)">
+    <span class="btn btn-primary p-1">Her gün değişsin (hafta sonu hariç) </span>
+  </label>
+  <br>
+  <br>
+  <br>
+
+  <h2>Logo Ayarları</h2>
+  <input style="display: inline; width: auto;" class="form-control" type="file" id="logoInput">
+  <br>
+  <button style="margin-top:10px" class="btn btn-primary" onclick="uploadLogo()">Yükle</button>
+  <br><br>
+  <label>Logo Genişliği:
+    <input style="display: inline; width: auto;" class="form-control" type="number" id="logoWidth" value="200" onchange="updateLogoWidth()">
+  </label>
+  <br>
+  <img id="logoImg" src="" style="width:200px;">
+  <br>
+  <br>
+
+  <h2>Versiyon Kontrol</h2>
+  <span>Güncel Versiyon: </span><span><strong id="localVersion">1.1</strong></span><br>
+  <button onclick="checkVersion()" class="btn btn-success">Güncellemeleri Kontrol Et</button>
+
+
+  <br>
+  <br>
+  <span class="form-text">Made by <a href="https://www.yunusforge.com">yunusforge.com</a> and contributed by <a href="https://www.linkedin.com/in/mustafa-s-848868a8/">Mustafa SEYHAN</a> - <a
+      href="https://aselsanmtal.meb.k12.tr/">Aselsan MTAL</a></span>
+  <br>
+  <br>
+  <script>
+    let allData = {};
+
+    // --- Load data ---
+    async function loadData() {
+      try {
+        const res = await fetch('/api/get');
+        if (!res.ok) throw new Error(await res.text());
+        allData = await res.json();
+        console.log('Yüklendi:', allData);
+      } catch (err) {
+        console.error('loadData error:', err);
+        allData = {};
+      }
+    }
+
+    // --- Save data ---
+    async function saveData() {
+      try {
+        const res = await fetch('/api/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(allData)
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const json = await res.json();
+        if (json.saved) allData = json.saved;
+      } catch (err) {
+        console.error('saveData error:', err);
+      }
+    }
+
+    // --- Schedule ---
+    function getSchedule() { return allData.schedule || {}; }
+    async function saveSchedule(schedule) { allData.schedule = schedule; await saveData(); }
+
+    async function renderSchedule() {
+      const day = document.getElementById("daySelect").value;
+      const list = document.getElementById("scheduleList");
+      list.innerHTML = "";
+
+      const schedule = getSchedule();
+      const items = schedule[day] || [];
+
+      // Başlama saatine göre sıralama
+      items.sort((a, b) => a.start.localeCompare(b.start));
+
+      items.forEach((item, i) => {
+        const li = document.createElement("li");
+
+        // Tür değiştirilemez, sadece gösterim
+        const typeSpan = document.createElement("span");
+        typeSpan.textContent = item.type === "ders" ? "Ders" : "Teneffüs";
+        typeSpan.style.marginRight = "10px";
+        typeSpan.classList.add("badge", item.type === "ders" ? "bg-primary" : "bg-secondary");
+
+        const start = document.createElement("input");
+        start.type = "time";
+        start.value = item.start;
+        start.classList.add("form-control", "d-inline", "w-a");
+        start.onchange = async () => {
+          items[i].start = start.value;
+          schedule[day] = items;
+          // Yeniden sıralamak için renderSchedule tekrar çağrılır
+          await saveSchedule(schedule);
+          renderSchedule();
+        };
+
+        const end = document.createElement("input");
+        end.type = "time";
+        end.value = item.end;
+        end.classList.add("form-control", "d-inline", "w-a");
+        end.onchange = async () => {
+          items[i].end = end.value;
+          schedule[day] = items;
+          await saveSchedule(schedule);
+        };
+
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "Sil";
+        delBtn.classList.add("btn", "btn-primary");
+        delBtn.onclick = async () => {
+          items.splice(i, 1);
+          schedule[day] = items;
+          await saveSchedule(schedule);
+          renderSchedule();
+        };
+
+        li.appendChild(typeSpan);
+        li.appendChild(start);
+        li.appendChild(end);
+        li.appendChild(delBtn);
+        list.appendChild(li);
+      });
+    }
+
+    async function addItem() {
+      const type = document.getElementById("typeSelect").value;
+      const start = document.getElementById("startTime").value;
+      const end = document.getElementById("endTime").value;
+      if (!start || !end) return;
+
+      const schedule = getSchedule();
+      const multiDays = Array.from(document.getElementById("multiDaySelect").selectedOptions).map(o => o.value);
+
+      const newItem = { type, start, end };
+
+      if (multiDays.length > 0) {
+        multiDays.forEach(d => {
+          if (!schedule[d]) schedule[d] = [];
+          schedule[d].push({ ...newItem });
+          // Başlama saatine göre sıralama
+          schedule[d].sort((a, b) => a.start.localeCompare(b.start));
+        });
+      } else {
+        const day = document.getElementById("daySelect").value;
+        if (!schedule[day]) schedule[day] = [];
+        schedule[day].push({ ...newItem });
+        schedule[day].sort((a, b) => a.start.localeCompare(b.start));
+      }
+
+      await saveSchedule(schedule);
+
+      document.getElementById("startTime").value = "";
+      document.getElementById("endTime").value = "";
+      renderSchedule();
+    }
+
+    // --- Quotes ---
+    function getQuotes() { return allData.quotes || []; }
+    async function saveQuotes(q) { allData.quotes = q; await saveData(); }
+
+    function renderQuotes() {
+      const list = document.getElementById("quoteList");
+      list.innerHTML = "";
+      const quotes = getQuotes();
+      quotes.forEach((q, i) => {
+        const li = document.createElement("li");
+        const input = document.createElement("input");
+        input.type = "text"; input.value = q.text; input.size = 50;
+        input.classList.add("form-control", "d-inline", "w-a");
+        input.onchange = async () => { quotes[i].text = input.value; await saveQuotes(quotes); }
+
+        const chk = document.createElement("input");
+        chk.type = "radio"; chk.name = "currentQuote"; chk.checked = q.current;
+        chk.onclick = async () => { quotes.forEach(x => x.current = false); quotes[i].current = true; await saveQuotes(quotes); renderQuotes(); }
+
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "Sil"; delBtn.classList.add("btn", "btn-primary");
+        delBtn.onclick = async () => { quotes.splice(i, 1); await saveQuotes(quotes); renderQuotes(); }
+
+        li.appendChild(chk); li.appendChild(input); li.appendChild(delBtn);
+        list.appendChild(li);
+      });
+    }
+
+    async function addQuote() {
+      const input = document.getElementById("quoteInput");
+      const lines = input.value.split("\n").map(l => l.trim()).filter(l => l);
+      if (lines.length === 0) return;
+      const quotes = getQuotes();
+      lines.forEach(val => quotes.push({ text: val, current: false }));
+      await saveQuotes(quotes);
+      input.value = "";
+      renderQuotes();
+    }
+
+    // --- Frequency ---
+    function getFrequency() { return allData.frequency || 1; }
+    async function saveFrequency(val) { allData.frequency = parseInt(val); await saveData(); renderFrequency(); }
+    function renderFrequency() {
+      const freq = getFrequency();
+      document.querySelectorAll('input[name="frequency"]').forEach(r => r.checked = parseInt(r.value) === freq);
+    }
+
+    // --- Color settings ---
+    async function saveTimerColor(val) { allData.timerColor = val; await saveData(); }
+    async function saveBgColor(val) { allData.bgColor = val; await saveData(); }
+    function renderColors() {
+      document.getElementById("timerColorInput").value = allData.timerColor || "#000000";
+      document.getElementById("bgColorInput").value = allData.bgColor || "#ffffff";
+    }
+
+    // --- Logo ---
+    async function uploadLogo() {
+      const fileInput = document.getElementById("logoInput");
+      if (fileInput.files.length === 0) return alert("Dosya seçin");
+      const formData = new FormData();
+      formData.append("logo", fileInput.files[0]);
+      formData.append("logoWidth", document.getElementById("logoWidth").value);
+
+      try {
+        const res = await fetch('/api/upload-logo', { method: "POST", body: formData });
+        if (!res.ok) throw new Error(await res.text());
+        const json = await res.json();
+        allData.logoVersion = json.logoVersion;
+        allData.logoWidth = json.logoWidth;
+        updateLogo();
+      } catch (err) { console.error("Logo yükleme hatası:", err); }
+    }
+
+    function updateLogo() {
+      const logoImg = document.getElementById("logoImg");
+      const logoWidth = document.getElementById("logoWidth");
+      logoImg.src = `/api/logo?v=${allData.logoVersion || 0}`;
+      logoImg.style.width = (allData.logoWidth || 200) + "px";
+      logoWidth.value = (allData.logoWidth || 200);
+
+    }
+
+    function updateLogoWidth() {
+      const width = parseInt(document.getElementById("logoWidth").value) || 200;
+      allData.logoWidth = width;
+      updateLogo();
+      saveData();
+    }
+
+    async function checkVersion() {
+      const githubVersionURL = 'https://raw.githubusercontent.com/voselef/okul_sayac/refs/heads/main/.version'; // GitHub raw link
+
+      // 1. İnternet kontrolü
+      try {
+        await fetch('https://www.google.com', { mode: 'no-cors' });
+      } catch (err) {
+        alert('İnternet bağlantısı yok.');
+        return;
+      }
+
+      // 2. GitHub sürümünü çek
+      let remoteVersion;
+      try {
+        const res = await fetch(githubVersionURL);
+        if (!res.ok) throw new Error('GitHub sürümü alınamadı');
+        remoteVersion = (await res.text()).trim();
+      } catch (err) {
+        alert('GitHub sürümü alınamadı: ' + err.message);
+        return;
+      }
+
+      // 3. Yerel sürümü fetch et
+      let localVersion;
+      try {
+        const res = await fetch('/version'); // artık Express endpoint üzerinden
+        if (!res.ok) throw new Error('Yerel sürüm dosyası okunamadı');
+        localVersion = (await res.text()).trim();
+      } catch (err) {
+        alert(err.message);
+        return;
+      }
+
+      // 4. Karşılaştır
+      if (remoteVersion !== localVersion) {
+        // Farklı sürüm var
+
+        if (confirm(`Yeni sürüm bulundu! Yerel: ${localVersion}, GitHub: ${remoteVersion} Yeni sürüm indirilecek mi?`))
+          window.open("https://github.com/voselef/okul_sayac/");
+        // Buraya update işlemini tetikleyecek fonksiyonu çağırabilirsin
+      } else {
+        alert('Sürüm güncel.');
+      }
+    }
+    async function getLocalVersion() {
+      const res = await fetch('/version'); // artık Express endpoint üzerinden
+      if (!res.ok) throw new Error('Yerel sürüm dosyası okunamadı');
+      localVersion = (await res.text()).trim();
+      document.getElementById('localVersion').textContent = localVersion;
+    }
+    // --- Başlangıç ---
+    (async () => {
+      await loadData();
+      renderSchedule();
+      renderQuotes();
+      renderFrequency();
+      renderColors();
+      updateLogo();
+      getLocalVersion();
+    })();
+  </script>
+
+
+
+</body>
+
+</html>
