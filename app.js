@@ -143,6 +143,7 @@ app.get('/version', (req, res) => {
 
 
 app.listen(PORT, () => {
+  console.log(`Okul Sayac Uygulaması by voselef. githup.com/voselef`);
   console.log(`Server çalışıyor: http://localhost:${PORT}`);
   console.log(`ayarlar.json yolu: ${DATA_FILE}`);
 });

@@ -1,48 +1,97 @@
-# Okul Sayaç Uygulaması
-## Amacı:
-Ders ve teneffüs vakitlerinden kalan sürenin ayarlanabilir bir uygulama aracılığı ile öğrenciye zilsiz bir şekilde gösterilerek öğrencinin öz denetimini geliştirmek
-## Uygulanışı
-1. Ders ve teneffüs süreleri daha önceden ayar panelinden ayarlanır.
-2. Bilgisayar görev günü açıldığında otomatik olarak uygulamayı kiosk modunda başlatır ve sayaç devreye girer.
-## Özellikleri
-- Ders ve teneffüslerin ayar panelinden ayarlanabilmesi
-- Ekrandaki logonun, arkaplan renginin, sayaç renginin ayar panelinden değiştirilebilmesi
-- Alıntılar moduyla sayacın altında tarihteki önemli alıntıların gösterilebilmesi ve bu sözlerin ve değişim sıklığının ayar panelinden ayarlanabilmesi
-- Çoklu ders/teneffüs ekleme modu
+# OkulSayac
+
+## Amaç
+
+Ders ve teneffüs sürelerinden kalan zamanı, zilsiz ve görsel bir sayaç aracılığıyla öğrenciye göstermek. Bu sayede öğrencinin öz denetimi geliştirilir.
+
+## Uygulama
+
+* Ders ve teneffüs süreleri ayar panelinden belirlenir.
+* Bilgisayar açıldığında uygulama **kiosk modunda** başlar ve sayaç devreye girer.
+
+## Özellikler
+
+* Ders ve teneffüs sürelerini ayar panelinden değiştirebilme
+* Ekran logosu, arka plan rengi ve sayaç rengini özelleştirme
+* Alıntılar moduyla, sayaç altında tarihsel alıntıları gösterme ve bunların sıklığını ayarlama
+* Çoklu ders ve teneffüs ekleme desteği
+
 ## Gereksinimler
-### Donanım Gereksinimleri
-| Bileşen       | Minimum               | Önerilen                  | Notlar                                           |
-| ------------- | --------------------- | ------------------------- | ------------------------------------------------ |
-| CPU           | 1.5 GHz çift çekirdek | 2.0 GHz dört çekirdek     | Node.js ve Chromium’un sorunsuz çalışması için.  |
-| RAM           | 1 GB                  | 4 GB veya daha fazla      | Chromium ve Node.js’in aynı anda çalışması için. |
-| Depolama      | 500 MB boş alan       | 1 GB veya daha fazla      | Node.js, projeler ve Chromium cache için.        |
-| Ekran         | 1024x768              | 1920x1080 veya daha fazla | Kiosk modunda düzgün görüntü için.               |
-| Ağ Bağlantısı | Opsiyonel             | Hızlı internet            | Güncellemeler ve GitHub versiyon kontrolü için.  |
 
-### Yazılım Gereksinimleri
-| Bileşen        | Minimum Sürüm             | Notlar                                                        |
-| -------------- | ------------------------- | ------------------------------------------------------------- |
-| Node.js        | 18.x veya üstü            | Sunucu tarafı JavaScript için.                                |
-| npm            | 9.x veya üstü             | Node.js paketleri için.                                       |
-| Web tarayıcısı | Chromium 90+ / Chrome 90+ | Kiosk modunda HTML dosyasını göstermek için.                  |
-| Bash           | 5.x                       | Linux otomasyon scripti için.                                 |
-| systemd        | 245+                      | Linux açılışta servis oluşturmak için.                        |
-| curl veya wget | Herhangi                  | Node.js yükleme scripti için.                                 |
-| git            | Herhangi (Opsiyonel)      | GitHub’dan güncelleme çekmek için, temel çalışmaya gerek yok. |
+### Donanım
 
+| Bileşen  | Minimum               | Önerilen              |
+| -------- | --------------------- | --------------------- |
+| CPU      | 1.5 GHz çift çekirdek | 2.0 GHz dört çekirdek |
+| RAM      | 1 GB                  | 4 GB veya daha fazla  |
+| Depolama | 500 MB                | 1 GB veya daha fazla  |
+| Ekran    | 1024x768              | 1920x1080 veya üstü   |
+| Ağ       | Opsiyonel             | Hızlı internet        |
+
+### Yazılım
+
+| Bileşen        | Minimum Sürüm   | Notlar                     |
+| -------------- | --------------- | -------------------------- |
+| Node.js        | 18.x            | Sunucu tarafı JS           |
+| npm            | 9.x             | Node paketleri             |
+| Tarayıcı       | Chrome/Edge 90+ | Kiosk modunda çalışır      |
+| Linux script   | Bash 5.x        | Linux otomasyon için       |
+| Windows script | Batch           | Başlangıç ve Node kontrolü |
+| Git            | Opsiyonel       | Güncelleme için            |
 
 ## Uyumluluk
-- Linux (Tam destek)
-  - Ubuntu 20.04 / 22.04 LTS
-  - Debian 10 / 11
-  - Fedora 35+
-  - CentOS 8+
-  - Mint 21+
-  - Özellik: systemd desteği, Bash script ve Chromium kiosk modu sorunsuz çalışır.
-- Windows
-  - Windows 10 / 11 Pro veya Home
-  - Özellik: Node.js ve Chrome/Chromium kurulu olmalı, otomatik açılış için Task Scheduler kullanılır.
-- macOS
-  - macOS 12 (Monterey) veya üstü
-  - Özellik: Node.js ve Chrome/Chromium kurulu olmalı, otomatik açılış LaunchAgents ile yapılabilir.
-  - Not: Linux Bash script’i tam uyumlu değildir, ufak uyarlamalar gerekebilir.
+
+* **Linux:** Ubuntu 20.04+, Debian 10+, Fedora 35+, CentOS 8+, Mint 21+
+* **Windows:** 10 / 11 Pro veya Home
+* **macOS:** 12 (Monterey) ve üstü (script uyarlama gerekebilir)
+
+## Kurulum
+
+### Windows
+
+1. Projeyi klonlayın veya indirin:
+
+```bat
+git clone https://github.com/kullaniciadi/OkulSayac.git
+cd OkulSayac
+```
+
+2. Scripti çalıştırın:
+
+```bat
+OkulSayac.bat
+```
+
+3. Başlangıçtan kaldırmak için:
+
+```bat
+remove_startup.bat
+```
+
+### Linux
+
+1. Projeyi klonlayın veya indirin:
+
+```bash
+git clone https://github.com/kullaniciadi/OkulSayac.git
+cd OkulSayac
+```
+
+2. Scripti çalıştırılabilir yapın:
+
+```bash
+chmod +x OkulSayac.sh OkulSayac_remove.sh
+```
+
+3. Scripti başlatın:
+
+```bash
+./OkulSayac.sh
+```
+
+4. Başlangıçtan kaldırmak için:
+
+```bash
+./OkulSayac_remove.sh
+```
+
