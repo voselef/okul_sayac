@@ -52,7 +52,7 @@ Ders ve teneffüs sürelerinden kalan zamanı, zilsiz ve görsel bir sayaç arac
 1. Projeyi klonlayın veya indirin:
 
 ```bat
-git clone https://github.com/kullaniciadi/OkulSayac.git
+git clone https://github.com/voselef/okul_sayac.git
 cd OkulSayac
 ```
 
@@ -73,7 +73,7 @@ remove_startup.bat
 1. Projeyi klonlayın veya indirin:
 
 ```bash
-git clone https://github.com/kullaniciadi/OkulSayac.git
+git clone https://github.com/voselef/okul_sayac.git
 cd OkulSayac
 ```
 
