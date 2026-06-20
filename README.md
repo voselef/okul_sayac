@@ -2,7 +2,7 @@
 
 ## Amaç
 
-Ders ve teneffüs sürelerinden kalan zamanı, zilsiz ve görsel bir sayaç aracılığıyla öğrenciye göstermek. Bu sayede öğrencinin öz denetimi geliştirilir.
+Ders ve teneffüs sürelerinden kalan zamanı, zilsiz ve görsel bir sayaç aracılığıyla öğrenciye göstermek. Bu sayede öğrencinin öz denetimi geliştirmek ve çevredeki ses gürültüsünü azaltmak.
 
 ## Uygulama
 
